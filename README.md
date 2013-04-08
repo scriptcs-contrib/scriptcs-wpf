@@ -117,4 +117,7 @@ For a working sample application, please check out the [sample folder](https://g
 
 ## Bugs and Feature Requests
 If you find any bugs or would like to see new features/changes in this Script Pack, 
-please let me know by [filing an issue](https://github.com/khellang/scriptcs-wpf/issues/new) or sending a pull request :grin:
+please let me know by [filing an issue](https://github.com/khellang/scriptcs-wpf/issues/new) or sending a pull request :grin:  
+
+
+Did you count how many times you read the words "script" and "pack" in this readme? :stuck_out_tongue_closed_eyes:
