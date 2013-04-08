@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$-alpha</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://raw.github.com/khellang/scriptcs-wpf/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/khellang/scriptcs-wpf</projectUrl>
+    <iconUrl>https://github.com/scriptcs/scriptcs/raw/dev/common/Icon.ico</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright Kristian Hellang 2013</copyright>
+    <tags>scriptcs wpf</tags>
+  </metadata>
+</package>
