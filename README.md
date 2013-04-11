@@ -34,7 +34,7 @@ And import the following namespaces:
  - System.Windows
  - System.Windows.Input
 
-To use the pack's utility methods in your scripts, use `Require<Wpf>` to get the Script Pack context.
+To use the packs utility methods in your scripts, use `Require<Wpf>` to get the Script Pack context.
 
 The context has several handy utility methods:
 
