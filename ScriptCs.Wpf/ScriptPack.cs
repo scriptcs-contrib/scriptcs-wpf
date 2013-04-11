@@ -33,7 +33,13 @@ namespace ScriptCs.Wpf
 
         public IScriptPackContext GetContext()
         {
-            return new Wpf();
+            var fileSystem = new FileSystem();
+            var threadManager = new ThreadManager();
+            var xamlLoader = new XamlLoader(fileSystem);
+            var viewLocator = new ViewLocator(fileSystem);
+            var applicationLauncher = new ApplicationLauncher();
+
+            return new Wpf(applicationLauncher, viewLocator, xamlLoader, threadManager);
         }
 
         public void Terminate() { }

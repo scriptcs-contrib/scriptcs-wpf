@@ -40,16 +40,17 @@ The context has several handy utility methods:
 
 ```csharp
 void RunApplication<TViewModel>()
+void RunApplication<TViewModel>(TViewModel viewModel)
 void RunApplication<TViewModel>(string xamlFile)
 void RunApplication<TViewModel>(string xamlFile, TViewModel viewModel)
-void RunApplication<TViewModel>(TViewModel viewModel)
-FrameworkElement LoadXaml(string xamlFile)
+void RunApplication(string xamlFile)
 void RunInSTA(Action action)
+DependencyObject LoadXaml(string xamlFile)
 ```
 
 ### `LoadXaml` and `RunInSTA`
 
-`LoadXaml` loads the given a XAML resource as a `FrameworkElement`.  
+`LoadXaml` loads the given a XAML resource as a `DependencyObject`.  
 `RunInSTA` wraps and invokes the given action in an STA thread. This method will block until the application is terminated. 
 
 The following is a more verbose script that shows the usage of the `LoadXaml` and `RunInSTA` methods:
@@ -90,9 +91,9 @@ wpf.RunInSTA(() =>
 });
 ```
 
-### `RunApplication<TViewModel>`
+### `RunApplication`
 
-The `RunApplication<TViewModel>` methods will take care of creating an `Application` object for you.  
+The `RunApplication` methods will take care of creating an `Application` object for you.  
 In addition to that, they will load the XAML View, set its `DataContext`, create a `Window` and run the application, 
 all in an STA thread :sunny:
 
@@ -109,6 +110,8 @@ wpf.RunApplication<CalculatorViewModel>("CalculatorView.xaml");
 wpf.RunApplication(new CalculatorViewModel()); // Uses convention to find View for ViewModel
  
 wpf.RunApplication<CalculatorViewModel>();  // Uses convention to find View for ViewModel
+
+wpf.RunApplication("CalculatorView.xaml") // No ViewModel
 ```
 
 ## Sample

@@ -1,10 +1,12 @@
 public class CalculatorViewModel : ViewModelBase
 {
+	private const string DefaultDisplay = "0";
+
 	private string _display;
 
 	public CalculatorViewModel()
 	{
-		Display = "0";
+		Display = DefaultDisplay;
 		
 		NumberCommand = new RelayCommand(param => AddNumber(Convert.ToInt32(param)), param => CanAddNumber);
 
@@ -68,6 +70,9 @@ public class CalculatorViewModel : ViewModelBase
 
 	private void AddNumber(int number)
 	{
+		if (Display == DefaultDisplay)
+			Display = string.Empty;
+			
 		if (Operator.HasValue)
 		{
 			Operand2 = !Operand2.HasValue ? number : (Operand2 * 10) + number;
@@ -111,7 +116,7 @@ public class CalculatorViewModel : ViewModelBase
 		Operator = null;
 		Operand2 = null;
 		Result = null;
-		Display = "0";
+		Display = DefaultDisplay;
 	}
 
 	private RelayCommand CreateOperatorCommand(char @operator)

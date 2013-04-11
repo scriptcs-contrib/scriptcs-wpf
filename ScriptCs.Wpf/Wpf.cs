@@ -1,106 +1,81 @@
 ﻿using System;
-using System.IO;
-using System.Threading;
 using System.Windows;
-using System.Windows.Markup;
 
-using ScriptCs.Contracts;
+using ScriptCs.Wpf.Interfaces;
 
 namespace ScriptCs.Wpf
 {
-    public class Wpf : IScriptPackContext
+    public class Wpf : IWpfContext
     {
+        private readonly IApplicationLauncher _applicationLauncher;
+
+        private readonly IViewLocator _viewLocator;
+
+        private readonly IXamlLoader _xamlLoader;
+
+        private readonly IThreadManager _threadManager;
+
+        public Wpf(
+            IApplicationLauncher applicationLauncher,
+            IViewLocator viewLocator,
+            IXamlLoader xamlLoader,
+            IThreadManager threadManager)
+        {
+            _applicationLauncher = applicationLauncher;
+            _viewLocator = viewLocator;
+            _xamlLoader = xamlLoader;
+            _threadManager = threadManager;
+        }
+
         public void RunApplication<TViewModel>()
-            where TViewModel : new()
+            where TViewModel : class, new()
         {
             RunApplication(new TViewModel());
         }
 
         public void RunApplication<TViewModel>(TViewModel viewModel)
+            where TViewModel : class
         {
-            var xamlFile = LocateViewFor<TViewModel>();
-
-            if (string.IsNullOrEmpty(xamlFile))
-                throw new InvalidOperationException(string.Format("Could not locate view for {0}", typeof(TViewModel).Name));
-
+            var xamlFile = _viewLocator.LocateViewFor<TViewModel>();
             RunApplication(xamlFile, viewModel);
         }
 
         public void RunApplication<TViewModel>(string xamlFile)
-            where TViewModel : new()
+            where TViewModel : class, new()
         {
             RunApplication(xamlFile, new TViewModel());
         }
 
         public void RunApplication<TViewModel>(string xamlFile, TViewModel viewModel)
+            where TViewModel : class
         {
-            RunInSTA(() =>
-            {
-                var view = LoadXaml(xamlFile);
-
-                if (view == null)
-                    throw new InvalidOperationException(string.Format("Failed to load XAML file '{0}'", xamlFile));
-
-                view.DataContext = viewModel;
-
-                var mainWindow = new Window { Content = view, SizeToContent = SizeToContent.WidthAndHeight };
-                var application = new WpfApplication(mainWindow);
-
-                application.Run();
-            });
+            RunApplication(xamlFile, (object) viewModel);
         }
 
-        public FrameworkElement LoadXaml(string xamlFile)
+        public void RunApplication(string xamlFile)
         {
-            using (var fileStream = File.OpenRead(xamlFile))
-            {
-                return XamlReader.Load(fileStream) as FrameworkElement;
-            }
+            RunApplication(xamlFile, null);
+        }
+
+        public DependencyObject LoadXaml(string xamlFile)
+        {
+            return _xamlLoader.LoadXaml(xamlFile);
         }
 
         public void RunInSTA(Action action)
         {
-            var thread = new Thread(() => action());
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
-            thread.Join();
+            _threadManager.RunInSTA(action);
         }
 
-        private static string LocateViewFor<T>()
+        private void RunApplication(string xamlFile, object viewModel)
         {
-            const string ViewModelString = "ViewModel";
+            if (string.IsNullOrEmpty(xamlFile)) throw new ArgumentNullException("xamlFile");
 
-            var viewModelName = typeof(T).Name;
-
-            if (!viewModelName.EndsWith(ViewModelString, StringComparison.InvariantCultureIgnoreCase))
-                return null;
-
-            var viewName = viewModelName.Replace(ViewModelString, string.Empty);
-            if (!string.IsNullOrEmpty(viewName))
+            _threadManager.RunInSTA(() =>
             {
-                var fileName = string.Format("{0}View.xaml", viewName);
-                var filePath = Path.Combine(Environment.CurrentDirectory, fileName);
-
-                if (File.Exists(filePath))
-                    return filePath;
-            }
-
-            return null;
-        }
-
-        private class WpfApplication : Application
-        {
-            private readonly Window _mainWindow;
-
-            public WpfApplication(Window mainWindow)
-            {
-                _mainWindow = mainWindow;
-            }
-
-            protected override void OnStartup(StartupEventArgs e)
-            {
-                _mainWindow.Show();
-            }
+                var view = _xamlLoader.LoadXaml(xamlFile);
+                _applicationLauncher.CreateAndRunApplication(view, viewModel);
+            });
         }
     }
 }
